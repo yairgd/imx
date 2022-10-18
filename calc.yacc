@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include "instructions.h"
 
 
 int regs[26];
@@ -14,6 +15,7 @@ int col;
       int iValue;
       int a;
       int opcode;
+      char string[16];
 };
 
 
@@ -21,6 +23,8 @@ int col;
 
 %token <opcode> OPCODE  
 %token <iValue> NUMBER REG_NUMBER DIGIT NOTE1 NOTE2
+%token  <string>     LABEL 
+
 %type  <a>     number 
 
 
@@ -51,15 +55,27 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 		printf ("opcode %d %d,%d \n",$1,$2,$4);
 	}
 	|
-	OPCODE REG_NUMBER ',' '(' REG_NUMBER ',' number ')' 
+	OPCODE REG_NUMBER ',' '(' REG_NUMBER ',' NUMBER ')' 
 	{
-		printf ("opcode %s r%d,(r%d , %d)\n",$1,$2,$5,$7);
+		printf ("opcode %d r%d,(r%d , %d)\n",$1,$2,$5,$7);
 	}
 	|
-	OPCODE ':'
+	OPCODE NUMBER
+	{
+		printf ("opcode %d %d\n",$1,$2);
+	}
+	|
+	LABEL 
 	{
 		printf ("label %s \n",$1);
 	}
+
+	OPCODE LABEL ',' NUMBER
+	{
+		printf ("opcode %d   %d)\n",$1,$4);
+
+	}
+
 
 	;
 
