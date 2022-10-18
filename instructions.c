@@ -20,12 +20,34 @@
 //http://blog.petri.us/sdma-hacking/part-1.html
 struct instruction {
 	char *opcode;
-	char *operand;
 	char instruction[16];
 }  instruction_set[] = {
-	{.opcode = "mov",.operand="r,i" , .instruction="00000rrr10001sss"},
+	{.opcode = "mov"  , .instruction="00000rrr10001sss"},
+
+	{.opcode = "andi" , .instruction="00111rrriiiiiiii"}, /* ldi r,i */
+	{.opcode = "ldi"  , .instruction="00111rrriiiiiiii"},
+	{.opcode = "addi" , .instruction="00111rrriiiiiiii"}, 
+	{.opcode = "cmpeqi",.instruction="00111rrriiiiiiii"}, 
+	{.opcode = "xori" , .instruction="00111rrriiiiiiii"}, 
+
+	{.opcode = "loop" , .instruction="011110ffnnnnnnnn"}, /* loop n,ff*/
+
+	{.opcode = "st"   , .instruction="01011rrrdddddbbb"},   /* st r,(d,b)*/
+	{.opcode = "ld"   , .instruction="01011rrrdddddbbb"},   /* ld r,(d,b)*/
+
+	{.opcode = "done"   , .instruction="00000jjj00000000"},   /* done jjj*/
+
+	{.opcode = "bt"   , .instruction="01111101pppppppp"},   /* bt pppp*/
+	{.opcode = "bf"   , .instruction="01111100pppppppp"},   /* bf pppp*/
+	{.opcode = "bsf"  , .instruction="01111110pppppppp"},   /* bsf pppp*/
+	{.opcode = "bff"  , .instruction="01111111pppppppp"},   /* bff pppp*/
+
 };
 
+/*
+ 
+
+   */
 /*
                               | start:
 0000 0804 (0000100000000100) |     ldi r0, 4
@@ -47,7 +69,7 @@ static const u32 sdma_code[5] = {
  0x08047803, 0x5c051d01, 0x1c100300, 0x1c400b00, 0x4b007df6,
 };
 
-    ldi r0, 4;loop exit:, 0;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start:
+    ldi r0, 4;loop exit, 0;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start
 
 */
 

@@ -50,29 +50,35 @@ list:    /*empty */
            yyerrok;
          }
          ;
-stat: 	OPCODE REG_NUMBER ',' NUMBER 
+stat: 	LABEL REG_NUMBER ',' NUMBER 
 	{
-		printf ("opcode %d %d,%d \n",$1,$2,$4);
+		printf ("opcode %s %d,%d \n",$1,$2,$4);
 	}
 	|
-	OPCODE REG_NUMBER ',' '(' REG_NUMBER ',' NUMBER ')' 
+	LABEL REG_NUMBER ',' '(' REG_NUMBER ',' NUMBER ')' 
 	{
-		printf ("opcode %d r%d,(r%d , %d)\n",$1,$2,$5,$7);
+		printf ("opcode %s r%d,(r%d , %d)\n",$1,$2,$5,$7);
 	}
 	|
-	OPCODE NUMBER
+	LABEL NUMBER
 	{
-		printf ("opcode %d %d\n",$1,$2);
+		printf ("opcode %s %d\n",$1,$2);
 	}
 	|
-	LABEL 
+	LABEL ':' 
 	{
 		printf ("label %s \n",$1);
 	}
-
-	OPCODE LABEL ',' NUMBER
+	|
+	LABEL LABEL ',' NUMBER
 	{
-		printf ("opcode %d   %d)\n",$1,$4);
+		printf ("opcode %s   %d\n",$1,$4);
+
+	}
+	|
+	LABEL LABEL 
+	{
+		printf ("opcode %s   %s\n",$1,$2);
 
 	}
 
