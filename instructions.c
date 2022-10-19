@@ -35,7 +35,7 @@ struct instruction {
 	{.opcode = "st"   , .instruction="01011rrrdddddbbb"},   /* st r,(d,b)*/
 	{.opcode = "ld"   , .instruction="01011rrrdddddbbb"},   /* ld r,(d,b)*/
 
-	{.opcode = "done" , .instruction="00000jjj00000000"},   /* done jjj*/
+	{.opcode = "done"   , .instruction="00000jjj00000000"},   /* done jjj*/
 
 	{.opcode = "bt"   , .instruction="01111101pppppppp"},   /* bt pppp*/
 	{.opcode = "bf"   , .instruction="01111100pppppppp"},   /* bf pppp*/
@@ -43,6 +43,8 @@ struct instruction {
 	{.opcode = "bff"  , .instruction="01111111pppppppp"},   /* bff pppp*/
 
 };
+
+
 
 
 int main() {
