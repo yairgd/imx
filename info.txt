@@ -1,0 +1,7 @@
+https://www.ibm.com/docs/en/aix/7.1?topic=information-example-program-lex-yacc-programs
+https://stackoverflow.com/questions/12876543/left-and-right-in-yacc
+https://klasses.cs.uchicago.edu/archive/2003/spring/22600-1/docs/lexyacc.pdf
+https://www.ibm.com/docs/en/aix/7.2?topic=information-yacc-grammar-file-declarations
+http://blog.petri.us/sdma-hacking/part-2.html
+https://stackoverflow.com/questions/12876543/left-and-right-in-yacc
+https://begriffs.com/posts/2021-11-28-practical-parsing.html
