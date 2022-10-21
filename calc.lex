@@ -34,6 +34,17 @@ r[0-9]+    {col+=strlen(yytext);yylval.iValue = atoi(yytext+1);return REG_NUMBER
 "addi"  {col+=strlen(yytext);yylval.opcode=OP_ADDI;return OPCODE;}
 "bt"  {col+=strlen(yytext);yylval.opcode=OP_BT;return OPCODE;}
 
+"mov"  {col+=strlen(yytext);yylval.opcode=OP_MOV;return OPCODE;}
+"add"  {col+=strlen(yytext);yylval.opcode=OP_ADD;return OPCODE;}
+"sub"  {col+=strlen(yytext);yylval.opcode=OP_SUB;return OPCODE;}
+"or"  {col+=strlen(yytext);yylval.opcode=OP_OR;return OPCODE;}
+"andn"  {col+=strlen(yytext);yylval.opcode=OP_ANDN;return OPCODE;}
+"and"  {col+=strlen(yytext);yylval.opcode=OP_AND;return OPCODE;}
+"cmpeq"  {col+=strlen(yytext);yylval.opcode=OP_CMPEQ;return OPCODE;}
+"cmplt"  {col+=strlen(yytext);yylval.opcode=OP_CMPLT;return OPCODE;}
+"cmphs"  {col+=strlen(yytext);yylval.opcode=OP_CMPHS;return OPCODE;}
+
+
 [a-zA-Z0-9]+  {col+=strlen(yytext);strncpy (yylval.string, yytext,16 );yylval.string[MIN(strlen(yytext),15)]=0; return LABEL;} 
 
 

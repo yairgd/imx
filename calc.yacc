@@ -25,7 +25,7 @@ int col;
 %token <iValue> NUMBER REG_NUMBER DIGIT NOTE1 NOTE2
 %token  <string>     LABEL 
 
-%type  <a>     number 
+	/*%type  <a>     number */
 
 
 
@@ -52,22 +52,34 @@ list:    /*empty */
          ;
 stat: 	OPCODE REG_NUMBER ',' NUMBER 
 	{
-		printf ("opcode %d %d,%d \n",$1,$2,$4);
+		//decode_5x3r38i($1, $2,  $4);
+		/*printf ("opcode %d %d,%d \n",$1,$2,$4);*/
+		decode_t f = get_decode_function($1);
+		f($1, $2,$4);
+
 	}
 	|
-	OPCODE REG_NUMBER ',' NUMBER 
+	OPCODE REG_NUMBER ',' REG_NUMBER 
 	{
-		printf ("opcode %d %d,%d \n",$1,$2,$4);
+		//decode_5x3r5x3s($1,$2,$4);
+		/*printf ("opcode %d %d,%d \n",$1,$2,$4);*/
+		decode_t f = get_decode_function($1);
+		f($1, $2,$4);
+
 	}
 	|
 	OPCODE REG_NUMBER ',' '(' REG_NUMBER ',' NUMBER ')' 
 	{
-		printf ("opcode %d r%d,(r%d , %d)\n",$1,$2,$5,$7);
+		decode_5x3r5d3b($1,$2,$5,$7);
+		/*printf ("opcode %d r%d,(r%d , %d)\n",$1,$2,$5,$7);*/
 	}
 	|
 	OPCODE NUMBER
 	{
-		printf ("opcode %d %d\n",$1,$2);
+		//printf ("opcode %d %d\n",$1,$2);
+		decode_t f = get_decode_function($1);
+		f($1, $2);
+
 	}
 	|
 	LABEL ':' 
@@ -77,39 +89,50 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	|
 	OPCODE LABEL ',' NUMBER
 	{
-		printf ("opcode %d   %d\n",$1,$4);
+		//printf ("opcode %d   %d\n",$1,$4);
+		//decode_loop($1, $2,$4);
+		decode_t f = get_decode_function($1);
+		f($1, $2,$4);
+
 
 	}
 	|
 	OPCODE LABEL 
 	{
-		printf ("opcode %d   %s\n",$1,$2);
+		decode_t f = get_decode_function($1);
+		f($1, $2,0);
+		//decode_loop($1, $2,0);
+		//printf ("opcode %d   %s\n",$1,$2);
 
 	}
 
 
 	;
 
+	/*
+	number:  DIGIT
+		 {
+		   $$ = $1;
+		   base = ($1==0) ? 8 : 10;
+		 }       
+		 |
+		 number DIGIT
+		 {
+		   $$ = base * $1 + $2;
+		 }
+		 ;
+	*/
 
-number:  DIGIT
-         {
-           $$ = $1;
-           base = ($1==0) ? 8 : 10;
-         }       
-	 |
-         number DIGIT
-         {
-           $$ = base * $1 + $2;
-         }
-         ;
+
 %%
 
 
 
- yyerror(s)
+ int yyerror(s)
 char *s;
 {
   fprintf(stderr, "%s, col:%d, line %d\n",s,col,line);
+  return 0;
 }
 
 yywrap()

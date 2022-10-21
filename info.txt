@@ -5,3 +5,5 @@ https://www.ibm.com/docs/en/aix/7.2?topic=information-yacc-grammar-file-declarat
 http://blog.petri.us/sdma-hacking/part-2.html
 https://stackoverflow.com/questions/12876543/left-and-right-in-yacc
 https://begriffs.com/posts/2021-11-28-practical-parsing.html
+https://u-aizu.ac.jp/~hamada/LP/L07-LP-Handouts.pdf
+https://begriffs.com/posts/2021-11-28-practical-parsing.html
