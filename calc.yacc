@@ -85,6 +85,7 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	LABEL ':' 
 	{
 		printf ("label %s \n",$1);
+		push_label($1);
 	}
 	|
 	OPCODE LABEL ',' NUMBER
@@ -135,7 +136,7 @@ char *s;
   return 0;
 }
 
-yywrap()
+int yywrap()
 {
   return(1);
 }

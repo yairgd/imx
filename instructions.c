@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
+//#include "y.tab.h"
 
 //http://blog.petri.us/sdma-hacking/part-1.html
 
@@ -29,6 +29,11 @@
 static unsigned short memory[4096];
 static int pc = 0;
 
+static struct label {
+	unsigned long hash;
+	int pc;
+} lables[256]={0};
+ static int label_idx = 0;
 
 
 
@@ -86,8 +91,45 @@ struct instruction_s   instruction_set[] = {
 
 };
 
+/* yacc functions definitions */
+struct yy_buffer_state;
+void yy_delete_buffer (struct yy_buffer_state *  );
+struct yy_buffer_state * yy_scan_string(const char*);
+int yyparse (void);
 
+unsigned long hash(unsigned char *str)
+{
+    unsigned long hash = 5381;
+    int c;
 
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
+}
+/**
+ * Created  10/24/2022
+ * @brief   push label as hash value
+ * @param   
+ * @return  
+ */
+void push_label(char *label) {
+	lables[label_idx].pc = pc;
+	lables[label_idx++].hash = hash((unsigned char*)label);
+
+}
+
+int get_pc_from_label(char *label) {
+	int p = -1;
+
+	for (int i = 0; i< label_idx;i++){
+		if (lables[i].hash == hash((unsigned char*)label)) {
+			p = lables[i].pc;
+		}
+
+	}
+	return p;
+}
 
 /**
  * Created  10/21/2022
@@ -156,7 +198,7 @@ decode_t get_decode_function(enum OPCODES op) {
  * @param   
  * @return  
  */
-void decode_5x3r38i(int a1, ...) {
+void decode_5x3r38i(enum OPCODES a1, ...) {
 	char instruction[16];
 	int a2,a4;
    	va_list ap;
@@ -190,7 +232,7 @@ void decode_5x3r38i(int a1, ...) {
  * @param   
  * @return  
  */
-void decode_5x3r5d3b(int a1, ...) {
+void decode_5x3r5d3b(enum OPCODES a1, ...) {
 	char instruction[16];
 	int a2,a5,a7;
    	va_list ap;
@@ -224,7 +266,7 @@ void decode_5x3r5d3b(int a1, ...) {
  * @param   
  * @return  
  */
-void decode_5x3r5x3s(int a1,...) {
+void decode_5x3r5x3s(enum OPCODES a1 ,...) {
 	char instruction[16];
 	int a2,a4;
    	va_list ap;
@@ -251,7 +293,7 @@ void decode_5x3r5x3s(int a1,...) {
  * @param   
  * @return  
  */
-void decode_8x8p(int a1,...) {
+void decode_8x8p(enum OPCODES a1,...) {
 	char instruction[16];
 	char *a2;
    	va_list ap;
@@ -261,6 +303,15 @@ void decode_8x8p(int a1,...) {
 	a2 = va_arg(ap, char*);
 	va_end(ap);
 
+	int p = get_pc_from_label(a2);
+	if (p == -1) {
+		printf("label %s not wans not defined\n",a2);
+	}
+	
+
+	memcpy (instruction,instruction_set[a1].instruction,16);
+	modify_instruction_string(instruction, p - pc - 1 , 'p'); 
+	instruction_string_to_word(instruction);
 	printf ("opcode %d   %s\n",a1,a2);
 
 }
@@ -277,11 +328,12 @@ void decode_8x8p(int a1,...) {
  * @param   
  * @return  
  */
-void decode_loop(int a1,...) {
+void decode_loop(enum OPCODES a1 ,...) {
 	char instruction[16];
 	char *a2;
 	int a4;
    	va_list ap;
+	int p;
 
 
 	va_start(ap, a1);
@@ -289,8 +341,13 @@ void decode_loop(int a1,...) {
 	a4 = va_arg(ap,int);
 	va_end(ap);
 
+	p = get_pc_from_label(a2);
+	if (p == -1) {
+		printf("label %s not wans not defined\n",a2);
+	}
+	
 	memcpy (instruction,instruction_set[a1].instruction,16);
-	modify_instruction_string(instruction, 3 , 'n'); 
+	modify_instruction_string(instruction, pc - p + 1, 'n'); 
 	modify_instruction_string(instruction, a4 , 'f'); 
 	instruction_string_to_word(instruction);
 
@@ -311,7 +368,7 @@ void decode_loop(int a1,...) {
  * @return  
  */
 
-void decode_done(int a1,...) {
+void decode_done(enum OPCODES a1 ,...) {
 	char instruction[16];
 	int a2;
    	va_list ap;
@@ -336,37 +393,21 @@ void decode_done(int a1,...) {
 
 
 
-/*
 
-
-*/
-struct yy_buffer_state * my_string_buffer = NULL;
-int my_scan_string(const char *s) {
-	// insist on cleaning up any existing buffer before setting up a new one
-	if (my_string_buffer != NULL) return -1;
-
-	// Set up and switch to a buffer for scanning the contents of the
-	// specified string.  A copy of the string will be made.
-	my_string_buffer = yy_scan_string(s);
-	return (my_string_buffer == NULL) ? -1 : 0;
-}
-
-
-void cleanup(void) {
-	// No effect if my_string_buffer is NULL
-	yy_delete_buffer(my_string_buffer);
-	// ... but avoid trying to free the same buffer twice
-	my_string_buffer = NULL;
-}
 
 
 int main() {
-	if (my_scan_string("ldi r0, 4;loop exit, 0;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n") != 0) {
-		fputs("error setting up an internal buffer\n", stderr);
-		exit(1);
-	}
-	yyparse();
-	//cleanup();
+	
+	struct yy_buffer_state *my_string_buffer0 = yy_scan_string("start:;ldi r0, 4;loop exit, 0;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n"); 
+	yyparse(); 
+	yy_delete_buffer(my_string_buffer0);
+
+
+	struct yy_buffer_state *my_string_buffer1 = yy_scan_string("start:;ldi r0, 4;loop exit, 0;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n"); 
+	yyparse(); 
+	yy_delete_buffer(my_string_buffer1);
+
+
 
 	for (int i=0;i<pc;i++)
 		printf("%x,",memory[i]);

@@ -57,21 +57,23 @@ enum OPCODES {
 };
 
 
-typedef int (*decode_t) (enum OPCODES op,...);
+typedef void (*decode_t) (enum OPCODES op,...);
 
 struct instruction_s {
 	char instruction[16];
 	decode_t decode;
 } ;
-void decode_5x3r38i(int opcode, ... );
-void decode_5x3r5d3b(int a1, ...);
-void decode_8x8p(int a1,...);
-void decode_5x3r5x3s(int a1, ...);
-void decode_loop(int a1, ...);
-void decode_done(int a1, ...);
-
+void decode_5x3r38i(enum OPCODES opcode, ... );
+void decode_5x3r5d3b(enum OPCODES  a1, ...);
+void decode_8x8p(enum OPCODES  a1,...);
+void decode_5x3r5x3s(enum OPCODES  a1, ...);
+void decode_loop(enum OPCODES  a1, ...);
+void decode_done(enum OPCODES  a1, ...);
+void decode_label(char *);
+void push_label(char *label);
 
 decode_t get_decode_function(enum OPCODES op);
+
 
 
 #endif
