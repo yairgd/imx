@@ -71,7 +71,8 @@ void decode_loop(enum OPCODES  a1, ...);
 void decode_done(enum OPCODES  a1, ...);
 void decode_label(char *);
 void push_label(char *label);
-
+void decode_3r(enum OPCODES a1, ...);
+void decode_3r5n(enum OPCODES a1, ...);
 decode_t get_decode_function(enum OPCODES op);
 
 

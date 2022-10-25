@@ -71,23 +71,21 @@ struct instruction_s   instruction_set[] = {
 
 
 
-	[OP_JMPR]  = {.instruction="00000rrr00001000", .decode = 0},   /* jumpr r*/
-	[OP_JSRR]  = {.instruction="00000rrr00001001", .decode = 0},   /* jsrr r*/
-	[OP_LDRPC] = {.instruction="00000rrr00001010", .decode = 0},   /* ldrpc r*/
-
-	
-	[OP_REVB]    = {.instruction="00000rrr00010000", .decode = 0},   /* jmpr r */
-	[OP_REVBLO]  = {.instruction="00000rrr00010001", .decode = 0},   /* jmpr r */
-	[OP_RORB]    = {.instruction="00000rrr00010010", .decode = 0},   /* jmpr r */
-	[OP_RORL]    = {.instruction="00000rrr00010100", .decode = 0},   /* jmpr r */
-	[OP_LSRL]    = {.instruction="00000rrr00010101", .decode = 0},   /* jmpr r */
-	[OP_ASRL]    = {.instruction="00000rrr00010110", .decode = 0},   /* jmpr r */
-	[OP_LSLL]    = {.instruction="00000rrr00010111", .decode = 0},   /* jmpr r */
+	[OP_JMPR]    = {.instruction="00000rrr00001000", .decode = decode_3r},   /* jumpr r*/
+	[OP_JSRR]    = {.instruction="00000rrr00001001", .decode = decode_3r},   /* jsrr r*/
+	[OP_LDRPC]   = {.instruction="00000rrr00001010", .decode = decode_3r},   /* ldrpc r*/
+	[OP_REVB]    = {.instruction="00000rrr00010000", .decode = decode_3r},   /* rev r */
+	[OP_REVBLO]  = {.instruction="00000rrr00010001", .decode = decode_3r},   /* revblo r */
+	[OP_RORB]    = {.instruction="00000rrr00010010", .decode = decode_3r},   /* rorb r */
+	[OP_RORL]    = {.instruction="00000rrr00010100", .decode = decode_3r},   /* jmpr r */
+	[OP_LSRL]    = {.instruction="00000rrr00010101", .decode = decode_3r},   /* jmpr r */
+	[OP_ASRL]    = {.instruction="00000rrr00010110", .decode = decode_3r},   /* jmpr r */
+	[OP_LSLL]    = {.instruction="00000rrr00010111", .decode = decode_3r},   /* jmpr r */
 	
 
-	[OP_BCLRI]    = {.instruction="00000rrr001nnnnn", .decode = 0},   /* bclri r,n */
-	[OP_BSETI]    = {.instruction="00000rrr010nnnnn", .decode = 0},   /* nseti r,n */
-	[OP_BTSTI]    = {.instruction="00000rrr011nnnnn", .decode = 0},   /* btsti r,n */
+	[OP_BCLRI]    = {.instruction="00000rrr001nnnnn", .decode = decode_3r5n},   /* bclri r,n */
+	[OP_BSETI]    = {.instruction="00000rrr010nnnnn", .decode = decode_3r5n},   /* nseti r,n */
+	[OP_BTSTI]    = {.instruction="00000rrr011nnnnn", .decode = decode_3r5n},   /* btsti r,n */
 
 };
 
@@ -220,6 +218,69 @@ void decode_5x3r38i(enum OPCODES a1, ...) {
 	
 
 }
+
+
+/**
+ * Created  10/19/2022                         
+ *                                                      1   2  3
+ *                                                          r  i 
+ * @brief   decodes this format 00000rrr001nnnnn ->  blrci r1, i 
+ * r=a2, i=a4
+ * example for andi r2,12
+ * a1=OP_ANDI, a2=2  , a4=12 -> OP_ANDI 2,12
+ * @param   
+ * @return  
+ */
+void decode_3r5n(enum OPCODES a1, ...) {
+	char instruction[16];
+	int a2, a3;
+   	va_list ap;
+
+
+	va_start(ap, a1);
+	a2 = va_arg(ap, int);
+	a3 = va_arg(ap, int);
+	va_end(ap);
+
+	memcpy (instruction,instruction_set[a1].instruction,16);
+	modify_instruction_string(instruction, a2 , 'r'); 
+	modify_instruction_string(instruction, a3 , 'i'); 
+	instruction_string_to_word(instruction);
+
+	printf ("opcode %d",a2);
+
+}
+
+
+/**
+ * Created  10/19/2022                         
+ *                                                      1  2  
+ *                                                         r   
+ * @brief   decodes this format 00000rrr00001000 -> jumpr r1 
+ * r=a2, i=a4
+ * example for andi r2,12
+ * a1=OP_ANDI, a2=2  , a4=12 -> OP_ANDI 2,12
+ * @param   
+ * @return  
+ */
+void decode_3r(enum OPCODES a1, ...) {
+	char instruction[16];
+	int a2;
+   	va_list ap;
+
+
+	va_start(ap, a1);
+	a2 = va_arg(ap, int);
+	va_end(ap);
+
+	memcpy (instruction,instruction_set[a1].instruction,16);
+	modify_instruction_string(instruction, a2 , 'r'); 
+	instruction_string_to_word(instruction);
+
+	printf ("opcode %d",a2);
+
+}
+
 
 /**
  * Created  10/19/2022                         
@@ -385,11 +446,6 @@ void decode_done(enum OPCODES a1 ,...) {
 
 
 }
-
-
-
-
-
 
 
 
