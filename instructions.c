@@ -38,54 +38,54 @@ static struct label {
 
 
 struct instruction_s   instruction_set[] = {
+	{.opcode = OP_ANDI, .instruction = "00111rrriiiiiiii", .decode = decode_5x3r38i}, /* ldi r,i */
+	{.opcode = OP_LDI,.instruction="00001rrriiiiiiii", .decode = decode_5x3r38i},
+	{.opcode = OP_ADDI,.instruction="00011rrriiiiiiii", .decode = decode_5x3r38i}, 
+	{.opcode = OP_CMPEQI,.instruction="01001rrriiiiiiii", .decode = decode_5x3r38i}, 
+	{.opcode = OP_XORI,.instruction="00010rrriiiiiiii", .decode = decode_5x3r38i}, 
 
-	[OP_ANDI]   = {.instruction="00111rrriiiiiiii", .decode = decode_5x3r38i}, /* ldi r,i */
-	[OP_LDI]    = {.instruction="00001rrriiiiiiii", .decode = decode_5x3r38i},
-	[OP_ADDI]   = {.instruction="00011rrriiiiiiii", .decode = decode_5x3r38i}, 
-	[OP_CMPEQI] = {.instruction="01001rrriiiiiiii", .decode = decode_5x3r38i}, 
-	[OP_XORI]   = {.instruction="00010rrriiiiiiii", .decode = decode_5x3r38i}, 
+	{.opcode = OP_LOOP, .instruction="011110ffnnnnnnnn", .decode = decode_loop}, /* loop n,ff*/
 
-	[OP_LOOP]   = {.instruction="011110ffnnnnnnnn", .decode = decode_loop}, /* loop n,ff*/
+	{.opcode = OP_ST, .instruction="01011rrrdddddbbb", .decode = decode_5x3r5d3b},   /* st r,(d,b)*/
+	{.opcode = OP_LD, .instruction="01010rrrdddddbbb", .decode = decode_5x3r5d3b},   /* ld r,(d,b)*/
 
-	[OP_ST]     = {.instruction="01011rrrdddddbbb", .decode = decode_5x3r5d3b},   /* st r,(d,b)*/
-	[OP_LD]     = {.instruction="01010rrrdddddbbb", .decode = decode_5x3r5d3b},   /* ld r,(d,b)*/
+	{.opcode = OP_DONE,.instruction="00000jjj00000000", .decode = decode_done},   /* done jjj*/
 
-	[OP_DONE]   = {.instruction="00000jjj00000000", .decode = decode_done},   /* done jjj*/
-
-	[OP_BT]     = {.instruction="01111101pppppppp", .decode = decode_8x8p},   /* bt pppp*/
-	[OP_BF]     = {.instruction="01111100pppppppp", .decode = decode_8x8p},   /* bf pppp*/
-	[OP_BSF]    = {.instruction="01111110pppppppp", .decode = decode_8x8p},   /* bsf pppp*/
-	[OP_BDF]    = {.instruction="01111111pppppppp", .decode = decode_8x8p},   /* bff pppp*/
+	{.opcode = OP_BT, .instruction="01111101pppppppp", .decode = decode_8x8p},   /* bt pppp*/
+	{.opcode = OP_BF, .instruction="01111100pppppppp", .decode = decode_8x8p},   /* bf pppp*/
+	{.opcode = OP_BSF, .instruction="01111110pppppppp", .decode = decode_8x8p},   /* bsf pppp*/
+	{.opcode = OP_BDF, .instruction="01111111pppppppp", .decode = decode_8x8p},   /* bff pppp*/
 
 
-	[OP_MOV]    = {.instruction="00000rrr10001sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
-	[OP_ADD]    = {.instruction="00000rrr10010sss", .decode = decode_5x3r5x3s},   /* add r,s*/
-	[OP_SUB]    = {.instruction="00000rrr10011sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
-	[OP_OR]	    = {.instruction="00000rrr10101sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
-	[OP_ANDN]   = {.instruction="00000rrr10110sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
-	[OP_AND]    = {.instruction="00000rrr10111sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
-	[OP_CMPEQ]  = {.instruction="00000rrr11001sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
-	[OP_CMPLT]  = {.instruction="00000rrr11010sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
-	[OP_CMPHS]  = {.instruction="00000rrr11011sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
-
+	{.opcode = OP_MOV, .instruction="00000rrr10001sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
+	{.opcode = OP_ADD, .instruction="00000rrr10010sss", .decode = decode_5x3r5x3s},   /* add r,s*/
+	{.opcode = OP_SUB, .instruction="00000rrr10011sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
+	{.opcode = OP_OR, .instruction="00000rrr10101sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
+	{.opcode = OP_ANDN, .instruction="00000rrr10110sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
+	{.opcode = OP_AND, .instruction="00000rrr10111sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
+	{.opcode = OP_CMPEQ, .instruction="00000rrr11001sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
+	{.opcode = OP_CMPLT, .instruction="00000rrr11010sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
+	{.opcode = OP_CMPHS, .instruction="00000rrr11011sss", .decode = decode_5x3r5x3s},   /* mov r,s*/
 
 
 
-	[OP_JMPR]    = {.instruction="00000rrr00001000", .decode = decode_3r},   /* jumpr r*/
-	[OP_JSRR]    = {.instruction="00000rrr00001001", .decode = decode_3r},   /* jsrr r*/
-	[OP_LDRPC]   = {.instruction="00000rrr00001010", .decode = decode_3r},   /* ldrpc r*/
-	[OP_REVB]    = {.instruction="00000rrr00010000", .decode = decode_3r},   /* rev r */
-	[OP_REVBLO]  = {.instruction="00000rrr00010001", .decode = decode_3r},   /* revblo r */
-	[OP_RORB]    = {.instruction="00000rrr00010010", .decode = decode_3r},   /* rorb r */
-	[OP_RORL]    = {.instruction="00000rrr00010100", .decode = decode_3r},   /* jmpr r */
-	[OP_LSRL]    = {.instruction="00000rrr00010101", .decode = decode_3r},   /* jmpr r */
-	[OP_ASRL]    = {.instruction="00000rrr00010110", .decode = decode_3r},   /* jmpr r */
-	[OP_LSLL]    = {.instruction="00000rrr00010111", .decode = decode_3r},   /* jmpr r */
+
+	{.opcode = OP_JMPR, .instruction="00000rrr00001000", .decode = decode_3r},   /* jumpr r*/
+	{.opcode = OP_JSRR, .instruction="00000rrr00001001", .decode = decode_3r},   /* jsrr r*/
+	{.opcode = OP_LDRPC, .instruction="00000rrr00001010", .decode = decode_3r},   /* ldrpc r*/
+	{.opcode = OP_REVB, .instruction="00000rrr00010000", .decode = decode_3r},   /* rev r */
+	{.opcode = OP_REVBLO, .instruction="00000rrr00010001", .decode = decode_3r},   /* revblo r */
+	{.opcode = OP_RORB, .instruction="00000rrr00010010", .decode = decode_3r},   /* rorb r */
+	{.opcode = OP_RORL, .instruction="00000rrr00010100", .decode = decode_3r},   /* jmpr r */
+	{.opcode = OP_LSRL, .instruction="00000rrr00010101", .decode = decode_3r},   /* jmpr r */
+	{.opcode = OP_ASRL, .instruction="00000rrr00010110", .decode = decode_3r},   /* jmpr r */
+	{.opcode = OP_LSLL, .instruction="00000rrr00010111", .decode = decode_3r},   /* jmpr r */
 	
 
-	[OP_BCLRI]    = {.instruction="00000rrr001nnnnn", .decode = decode_3r5n},   /* bclri r,n */
-	[OP_BSETI]    = {.instruction="00000rrr010nnnnn", .decode = decode_3r5n},   /* nseti r,n */
-	[OP_BTSTI]    = {.instruction="00000rrr011nnnnn", .decode = decode_3r5n},   /* btsti r,n */
+	{.opcode = OP_BCLRI, .instruction="00000rrr001nnnnn", .decode = decode_3r5n},   /* bclri r,n */
+	{.opcode = OP_BSETI, .instruction="00000rrr010nnnnn", .decode = decode_3r5n},   /* nseti r,n */
+	{.opcode = OP_BTSTI, .instruction="00000rrr011nnnnn", .decode = decode_3r5n},   /* btsti r,n */
+	{0}
 
 };
 
@@ -182,9 +182,52 @@ void instruction_string_to_word(char *str)
 
 
 
+/**
+ * Created  10/28/2022
+ * @brief   get decode function by opcode
+ * @param   
+ * @return  
+ */
 decode_t get_decode_function(enum OPCODES op) {
-	return instruction_set[op].decode;
+	struct instruction_s   *inst = instruction_set;
+	
+	while (inst->opcode) {
+		if (inst->opcode == op)
+			return inst->decode;
+		inst++;
+	}
+	return decode_invalid;
 }
+
+
+/**
+ * Created  10/28/2022
+ * @brief   get instruction by opcode
+ * @param   
+ * @return  
+ */
+char * get_instruction_pattern(enum OPCODES op) {
+	struct instruction_s   *inst = instruction_set;
+	
+	while (inst->opcode) {
+		if (inst->opcode == op)
+			return inst->instruction;
+		inst++;
+	}
+	return "xxxxxxxxxxxxxxxx";
+}
+
+
+/**
+ * Created  10/28/2022
+ * @brief   
+ * @param   
+ * @return  
+ */
+void decode_invalid(enum OPCODES a1, ...) {
+	printf ("invalid opcode %d \n",a1);
+}
+
 /**
  * Created  10/19/2022                         
  *                                                   1 2 3 4
@@ -201,7 +244,7 @@ void decode_5x3r38i(enum OPCODES a1, ...) {
 	int a2,a4;
    	va_list ap;
 
-	memcpy (instruction,instruction_set[a1].instruction,16);
+	memcpy (instruction,get_instruction_pattern(a1),16);
 
 	va_start(ap, a1);
 	a2 = va_arg(ap, int);
@@ -242,7 +285,7 @@ void decode_3r5n(enum OPCODES a1, ...) {
 	a3 = va_arg(ap, int);
 	va_end(ap);
 
-	memcpy (instruction,instruction_set[a1].instruction,16);
+	memcpy (instruction,get_instruction_pattern(a1),16);
 	modify_instruction_string(instruction, a2 , 'r'); 
 	modify_instruction_string(instruction, a3 , 'i'); 
 	instruction_string_to_word(instruction);
@@ -273,7 +316,7 @@ void decode_3r(enum OPCODES a1, ...) {
 	a2 = va_arg(ap, int);
 	va_end(ap);
 
-	memcpy (instruction,instruction_set[a1].instruction,16);
+	memcpy (instruction,get_instruction_pattern(a1),16);
 	modify_instruction_string(instruction, a2 , 'r'); 
 	instruction_string_to_word(instruction);
 
@@ -305,7 +348,7 @@ void decode_5x3r5d3b(enum OPCODES a1, ...) {
 	a7 = va_arg(ap, int);
 	va_end(ap);
 
-	memcpy (instruction,instruction_set[a1].instruction,16);
+	memcpy (instruction,get_instruction_pattern(a1),16);
 	modify_instruction_string(instruction, a2 , 'r'); 
 	modify_instruction_string(instruction, a5 , 'b'); 
 	modify_instruction_string(instruction, a7 , 'd'); 
@@ -338,7 +381,7 @@ void decode_5x3r5x3s(enum OPCODES a1 ,...) {
 	a4 = va_arg(ap, int);
 	va_end(ap);
 
-	memcpy (instruction,instruction_set[a1].instruction,16);
+	memcpy (instruction,get_instruction_pattern(a1),16);
 	printf ("opcode %d %d,%d \n",a1,a2,a4);
 }
 
@@ -370,7 +413,7 @@ void decode_8x8p(enum OPCODES a1,...) {
 	}
 	
 
-	memcpy (instruction,instruction_set[a1].instruction,16);
+	memcpy (instruction,get_instruction_pattern(a1),16);
 	modify_instruction_string(instruction, p - pc - 1 , 'p'); 
 	instruction_string_to_word(instruction);
 	printf ("opcode %d   %s\n",a1,a2);
@@ -407,7 +450,7 @@ void decode_loop(enum OPCODES a1 ,...) {
 		printf("label %s not wans not defined\n",a2);
 	}
 	
-	memcpy (instruction,instruction_set[a1].instruction,16);
+	memcpy (instruction,get_instruction_pattern(a1),16);
 	modify_instruction_string(instruction, pc - p + 1, 'n'); 
 	modify_instruction_string(instruction, a4 , 'f'); 
 	instruction_string_to_word(instruction);
@@ -439,14 +482,13 @@ void decode_done(enum OPCODES a1 ,...) {
 	a2 = va_arg(ap, int);
 	va_end(ap);
 
-	memcpy (instruction,instruction_set[a1].instruction,16);
+	memcpy (instruction, get_instruction_pattern(a1), 16);
 	modify_instruction_string(instruction, a2 , 'j'); 
 	instruction_string_to_word(instruction);
 
 
 
 }
-
 
 
 

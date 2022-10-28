@@ -19,6 +19,7 @@
 #ifndef INSRUCTIONS
 #define INSRUCTIONS 
 enum OPCODES {
+	INVALID,
 	OP_ANDI, 	
 	OP_LOOP, 	
 	OP_ST,		
@@ -60,6 +61,7 @@ enum OPCODES {
 typedef void (*decode_t) (enum OPCODES op,...);
 
 struct instruction_s {
+	enum OPCODES opcode;	
 	char instruction[16];
 	decode_t decode;
 } ;
@@ -73,6 +75,8 @@ void decode_label(char *);
 void push_label(char *label);
 void decode_3r(enum OPCODES a1, ...);
 void decode_3r5n(enum OPCODES a1, ...);
+void decode_invalid(enum OPCODES a1, ...);
+
 decode_t get_decode_function(enum OPCODES op);
 
 
