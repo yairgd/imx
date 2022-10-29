@@ -188,12 +188,15 @@ void instruction_string_to_word(char *str)
  * @param   
  * @return  
  */
-decode_t get_decode_function(enum OPCODES op) {
+decode_t get_decode_function(enum OPCODES op,char *op_name) {
 	struct instruction_s   *inst = instruction_set;
 	
 	while (inst->opcode) {
-		if (inst->opcode == op)
+		if (inst->opcode == op) {
+			// get the op code string name from the lexer definitions (see asm.lex)
+			strncpy(inst->op_name, op_name, 16);
 			return inst->decode;
+		}
 		inst++;
 	}
 	return decode_invalid;

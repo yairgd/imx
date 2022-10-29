@@ -1,8 +1,8 @@
 bindir=.
 BIN = asm 
 
-YSRCS +=calc.yacc
-LSRCS +=calc.lex
+YSRCS +=asm.yacc
+LSRCS +=asm.lex
 CSRCS +=instructions.c
 OBJEXT ?= .o
 

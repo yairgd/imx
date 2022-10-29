@@ -8,6 +8,7 @@ int base;
 int yydebug=1;
 int line;
 int col;
+char op_str[16];
 
 %}
 
@@ -54,8 +55,10 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	{
 		//decode_5x3r38i($1, $2,  $4);
 		/*printf ("opcode %d %d,%d \n",$1,$2,$4);*/
-		decode_t f = get_decode_function($1);
+		decode_t f = get_decode_function($1, op_str);
 		f($1, $2,$4);
+
+	//	printf("!!!!!!!!!!!!!!!!1 %s ",op_str);
 
 	}
 	|
@@ -63,7 +66,7 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	{
 		//decode_5x3r5x3s($1,$2,$4);
 		/*printf ("opcode %d %d,%d \n",$1,$2,$4);*/
-		decode_t f = get_decode_function($1);
+		decode_t f = get_decode_function($1, op_str);
 		f($1, $2,$4);
 
 	}
@@ -77,7 +80,7 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	OPCODE NUMBER
 	{
 		//printf ("opcode %d %d\n",$1,$2);
-		decode_t f = get_decode_function($1);
+		decode_t f = get_decode_function($1, op_str);
 		f($1, $2);
 
 	}
@@ -92,7 +95,7 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	{
 		//printf ("opcode %d   %d\n",$1,$4);
 		//decode_loop($1, $2,$4);
-		decode_t f = get_decode_function($1);
+		decode_t f = get_decode_function($1, op_str);
 		f($1, $2,$4);
 
 
@@ -100,7 +103,7 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	|
 	OPCODE LABEL 
 	{
-		decode_t f = get_decode_function($1);
+		decode_t f = get_decode_function($1, op_str);
 		f($1, $2,0);
 		//decode_loop($1, $2,0);
 		//printf ("opcode %d   %s\n",$1,$2);

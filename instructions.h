@@ -61,6 +61,7 @@ enum OPCODES {
 typedef void (*decode_t) (enum OPCODES op,...);
 
 struct instruction_s {
+	char op_name[16];
 	enum OPCODES opcode;	
 	char instruction[16];
 	decode_t decode;
@@ -77,7 +78,7 @@ void decode_3r(enum OPCODES a1, ...);
 void decode_3r5n(enum OPCODES a1, ...);
 void decode_invalid(enum OPCODES a1, ...);
 
-decode_t get_decode_function(enum OPCODES op);
+decode_t get_decode_function(enum OPCODES op,char *op_name);
 
 
 
