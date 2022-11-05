@@ -18,6 +18,27 @@
 
 #ifndef INSRUCTIONS
 #define INSRUCTIONS 
+#include <stdbool.h>
+
+
+#define  OP_NAME_ANDI 	"andi"
+#define  OP_NAME_LOOP 	"loop"  
+#define  OP_NAME_ST  	"st"     
+#define  OP_NAME_LDI	"ldi"   
+#define  OP_NAME_DONE	"done"   
+#define  OP_NAME_CMPEQI	"cmpeqi" 
+#define  OP_NAME_ADDI	"addi"   
+#define  OP_NAME_BT	"bt"     
+#define  OP_NAME_MOV	"mov"    
+#define  OP_NAME_ADD	"add"    
+#define  OP_NAME_SUB	"sub"    
+#define  OP_NAME_OR	"or"     
+#define  OP_NAME_ANDN	"andn"  
+#define  OP_NAME_AND	"and"    
+#define  OP_NAME_CMPEQ	"cmpeq"  
+#define  OP_NAME_CMPLT	"cmplt"  
+#define  OP_NAME_CMPHS	"cmphs" 
+
 enum OPCODES {
 	INVALID,
 	OP_ANDI, 	
@@ -58,28 +79,43 @@ enum OPCODES {
 };
 
 
-typedef void (*decode_t) (enum OPCODES op,...);
 
 struct instruction_s {
 	char op_name[16];
 	enum OPCODES opcode;	
 	char instruction[16];
-	decode_t decode;
+	void (*encode) (enum OPCODES op,...);
+	void (*decode) (int pc, struct instruction_s  *inst);
+
 } ;
-void decode_5x3r38i(enum OPCODES opcode, ... );
-void decode_5x3r5d3b(enum OPCODES  a1, ...);
-void decode_8x8p(enum OPCODES  a1,...);
-void decode_5x3r5x3s(enum OPCODES  a1, ...);
-void decode_loop(enum OPCODES  a1, ...);
-void decode_done(enum OPCODES  a1, ...);
-void decode_label(char *);
+
+typedef void (*decode_t) (unsigned short op_code, struct instruction_s  *inst);
+typedef void (*encode_t) (enum OPCODES op,...);
+
+
 void push_label(char *label);
-void decode_3r(enum OPCODES a1, ...);
-void decode_3r5n(enum OPCODES a1, ...);
-void decode_invalid(enum OPCODES a1, ...);
+encode_t get_encode_function(enum OPCODES op,char *op_name);
 
-decode_t get_decode_function(enum OPCODES op,char *op_name);
+void encode_5x3r38i(enum OPCODES opcode, ... );
+void encode_5x3r5d3b(enum OPCODES  a1, ...);
+void encode_8x8p(enum OPCODES  a1,...);
+void encode_5x3r5x3s(enum OPCODES  a1, ...);
+void encode_loop(enum OPCODES  a1, ...);
+void encode_done(enum OPCODES  a1, ...);
+void encode_label(char *);
+void encode_3r(enum OPCODES a1, ...);
+void encode_3r5n(enum OPCODES a1, ...);
+void encode_invalid(enum OPCODES a1, ...);
 
+
+
+
+void decode_5x3r38i(int pc, struct instruction_s  *inst);
+void decode_5x3r5d3b(int pc, struct instruction_s  *inst);
+void decode_8x8p(int pc, struct instruction_s  *inst) ;
+void decode_5x3r5x3s(int pc, struct instruction_s  *inst) ;
+void decode_loop(int pc, struct instruction_s  *inst) ;
+void decode_done(int pc, struct instruction_s  *inst) ;
 
 
 #endif

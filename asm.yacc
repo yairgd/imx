@@ -53,9 +53,9 @@ list:    /*empty */
          ;
 stat: 	OPCODE REG_NUMBER ',' NUMBER 
 	{
-		//decode_5x3r38i($1, $2,  $4);
+		//encode_5x3r38i($1, $2,  $4);
 		/*printf ("opcode %d %d,%d \n",$1,$2,$4);*/
-		decode_t f = get_decode_function($1, op_str);
+		encode_t f = get_encode_function($1, op_str);
 		f($1, $2,$4);
 
 	//	printf("!!!!!!!!!!!!!!!!1 %s ",op_str);
@@ -64,38 +64,38 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	|
 	OPCODE REG_NUMBER ',' REG_NUMBER 
 	{
-		//decode_5x3r5x3s($1,$2,$4);
+		//encode_5x3r5x3s($1,$2,$4);
 		/*printf ("opcode %d %d,%d \n",$1,$2,$4);*/
-		decode_t f = get_decode_function($1, op_str);
+		encode_t f = get_encode_function($1, op_str);
 		f($1, $2,$4);
 
 	}
 	|
 	OPCODE REG_NUMBER ',' '(' REG_NUMBER ',' NUMBER ')' 
 	{
-		decode_5x3r5d3b($1,$2,$5,$7);
+		encode_5x3r5d3b($1,$2,$5,$7);
 		/*printf ("opcode %d r%d,(r%d , %d)\n",$1,$2,$5,$7);*/
 	}
 	|
 	OPCODE NUMBER
 	{
 		//printf ("opcode %d %d\n",$1,$2);
-		decode_t f = get_decode_function($1, op_str);
+		encode_t f = get_encode_function($1, op_str);
 		f($1, $2);
 
 	}
 	|
 	LABEL ':' 
 	{
-		printf ("label %s \n",$1);
+		//printf ("label %s \n",$1);
 		push_label($1);
 	}
 	|
 	OPCODE LABEL ',' NUMBER
 	{
 		//printf ("opcode %d   %d\n",$1,$4);
-		//decode_loop($1, $2,$4);
-		decode_t f = get_decode_function($1, op_str);
+		//encode_loop($1, $2,$4);
+		encode_t f = get_encode_function($1, op_str);
 		f($1, $2,$4);
 
 
@@ -103,9 +103,9 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	|
 	OPCODE LABEL 
 	{
-		decode_t f = get_decode_function($1, op_str);
+		encode_t f = get_encode_function($1, op_str);
 		f($1, $2,0);
-		//decode_loop($1, $2,0);
+		//encode_loop($1, $2,0);
 		//printf ("opcode %d   %s\n",$1,$2);
 
 	}
