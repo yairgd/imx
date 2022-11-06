@@ -44,7 +44,16 @@ r[0-9]+   	 {col+=strlen(yytext);yylval.iValue = atoi(yytext+1);return REG_NUMBE
 "cmpeq"  OPCODE_FUNC(OP_CMPEQ)
 "cmplt"  OPCODE_FUNC(OP_CMPLT)
 "cmphs"  OPCODE_FUNC(OP_CMPHS)
-
+"jmpr"   OPCODE_FUNC(OP_RORL)
+"jsrr"   OPCODE_FUNC(OP_RORL)
+"ldrpc"  OPCODE_FUNC(OP_RORL)
+"revb"   OPCODE_FUNC(OP_RORL)
+"revblo" OPCODE_FUNC(OP_RORL)
+"rorb"   OPCODE_FUNC(OP_RORL)
+"rorl"   OPCODE_FUNC(OP_RORL)
+"lsrl"   OPCODE_FUNC(OP_RORL)
+"arsl"   OPCODE_FUNC(OP_RORL)
+"lsll"   OPCODE_FUNC(OP_RORL)
 
 [a-zA-Z0-9]+  {col+=strlen(yytext);strncpy (yylval.string, yytext,16 );yylval.string[MIN(strlen(yytext),15)]=0; return LABEL;} 
 

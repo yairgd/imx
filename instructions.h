@@ -116,6 +116,7 @@ void decode_8x8p(int pc, struct instruction_s  *inst) ;
 void decode_5x3r5x3s(int pc, struct instruction_s  *inst) ;
 void decode_loop(int pc, struct instruction_s  *inst) ;
 void decode_done(int pc, struct instruction_s  *inst) ;
+void decode_3r(int pc, struct instruction_s  *inst) ;
 
 
 #endif

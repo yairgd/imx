@@ -77,12 +77,16 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 		/*printf ("opcode %d r%d,(r%d , %d)\n",$1,$2,$5,$7);*/
 	}
 	|
+	OPCODE REG_NUMBER 
+	{
+		encode_3r($1,$2);
+	}
+	|
 	OPCODE NUMBER
 	{
 		//printf ("opcode %d %d\n",$1,$2);
 		encode_t f = get_encode_function($1, op_str);
 		f($1, $2);
-
 	}
 	|
 	LABEL ':' 

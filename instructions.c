@@ -69,16 +69,16 @@ struct instruction_s   instruction_set[] = {
 
 
 
-	{.opcode = OP_JMPR, 	.instruction = "00000rrr00001000", .encode = encode_3r},   /* jumpr r*/
-	{.opcode = OP_JSRR, 	.instruction = "00000rrr00001001", .encode = encode_3r},   /* jsrr r*/
-	{.opcode = OP_LDRPC, 	.instruction = "00000rrr00001010", .encode = encode_3r},   /* ldrpc r*/
-	{.opcode = OP_REVB, 	.instruction = "00000rrr00010000", .encode = encode_3r},   /* rev r */
-	{.opcode = OP_REVBLO, 	.instruction = "00000rrr00010001", .encode = encode_3r},   /* revblo r */
-	{.opcode = OP_RORB,	.instruction = "00000rrr00010010", .encode = encode_3r},   /* rorb r */
-	{.opcode = OP_RORL, 	.instruction = "00000rrr00010100", .encode = encode_3r},   /* jmpr r */
-	{.opcode = OP_LSRL, 	.instruction = "00000rrr00010101", .encode = encode_3r},   /* jmpr r */
-	{.opcode = OP_ASRL, 	.instruction = "00000rrr00010110", .encode = encode_3r},   /* jmpr r */
-	{.opcode = OP_LSLL, 	.instruction = "00000rrr00010111", .encode = encode_3r},   /* jmpr r */
+	{.opcode = OP_JMPR, 	.instruction = "00000rrr00001000", .encode = encode_3r,    .op_name="jmpr",	.decode = decode_3r },   /* jumpr r*/
+	{.opcode = OP_JSRR, 	.instruction = "00000rrr00001001", .encode = encode_3r,    .op_name="jsrr",	.decode = decode_3r},   /* jsrr r*/
+	{.opcode = OP_LDRPC, 	.instruction = "00000rrr00001010", .encode = encode_3r,    .op_name="ldrpc",	.decode = decode_3r},   /* ldrpc r*/
+	{.opcode = OP_REVB, 	.instruction = "00000rrr00010000", .encode = encode_3r,    .op_name="revb",	.decode = decode_3r},   /* rev r */
+	{.opcode = OP_REVBLO, 	.instruction = "00000rrr00010001", .encode = encode_3r,    .op_name="revblo",	.decode = decode_3r},   /* revblo r */
+	{.opcode = OP_RORB,	.instruction = "00000rrr00010010", .encode = encode_3r,    .op_name="rorb",	.decode = decode_3r},   /* rorb r */
+	{.opcode = OP_RORL, 	.instruction = "00000rrr00010100", .encode = encode_3r,    .op_name="rorl",	.decode = decode_3r},   /* jmpr r */
+	{.opcode = OP_LSRL, 	.instruction = "00000rrr00010101", .encode = encode_3r,    .op_name="lsrl",	.decode = decode_3r},   /* jmpr r */
+	{.opcode = OP_ASRL, 	.instruction = "00000rrr00010110", .encode = encode_3r,    .op_name="arsl",	.decode = decode_3r},   /* jmpr r */
+	{.opcode = OP_LSLL, 	.instruction = "00000rrr00010111", .encode = encode_3r,    .op_name="lsll",	.decode = decode_3r},   /* jmpr r */
 	
 
 	{.opcode = OP_BCLRI, 	.instruction = "00000rrr001nnnnn", .encode = encode_3r5n},   /* bclri r,n */
@@ -395,6 +395,18 @@ void decode_5x3r5x3s(int pc, struct instruction_s  *inst) {
 	printf("%04x  %04x  |  %s r%d,%d\n",pc, op_code, inst->op_name, r,s);
 }
 
+void decode_3r(int pc, struct instruction_s  *inst) {
+	unsigned short op_code = memory[pc];
+
+	int r = extract_operand_from_instruction(inst, 'r', op_code);
+	r &= 0x0007;
+
+	printf("%04x  %04x  |  %s r%d\n",pc, op_code, inst->op_name, r);
+}
+
+
+
+
 void decode_loop(int pc, struct instruction_s  *inst) {
 	unsigned short op_code = memory[pc];
 	int n = extract_operand_from_instruction(inst, 'n', op_code);
@@ -709,7 +721,7 @@ void decode() {
 
 
 void encode(char *asm_file1) {
-	char *asm_file = "start11:;ldi r0, 4;loop exit, 0;start:;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n";
+	char *asm_file = "start11:;ldi r0, 4;loop exit, 0;start:;st r4, (r5, 0);addi r5, 1;rorl r4;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n";
 	pc = 0;
 	struct yy_buffer_state *my_string_buffer0 = yy_scan_string(asm_file); 
 	yyparse(); 
@@ -720,7 +732,7 @@ void encode(char *asm_file1) {
 
 int main() {
 
-#if 1
+#if 0
 	memory[0]=0x804;
 	memory[1]=0x7803;
 	memory[2]=0x5c05;
