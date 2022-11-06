@@ -88,7 +88,7 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 	LABEL ':' 
 	{
 		//printf ("label %s \n",$1);
-		push_label($1);
+		push_label($1, -1);
 	}
 	|
 	OPCODE LABEL ',' NUMBER

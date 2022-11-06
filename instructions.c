@@ -21,7 +21,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
-//#include "y.tab.h"
 
 //http://blog.petri.us/sdma-hacking/part-1.html
 
@@ -111,10 +110,21 @@ unsigned long hash(unsigned char *str)
  * @param   
  * @return  
  */
-void push_label(char *label) {
-	lables[label_idx].pc = pc;
-	lables[label_idx].name = strdup (label);
-	lables[label_idx++].hash = hash((unsigned char*)label);
+void push_label(char *label,int _pc) {
+	static int label_id = 0;
+	char buf[32];
+
+	if (_pc == -1)  _pc = pc;
+	lables[label_idx].pc = _pc;
+	if (label) {	
+		lables[label_idx].name = strdup (label);
+		lables[label_idx++].hash = hash((unsigned char*)label);
+	} else {
+		snprintf(buf, sizeof(buf),"noname%d",label_id++);
+		lables[label_idx].name = strdup(buf);
+		lables[label_idx++].hash = hash((unsigned char*)buf);
+	}
+
 	
 }
 
@@ -198,11 +208,11 @@ int extract_operand_from_instruction(struct instruction_s  *inst, char c, unsign
 	if (i < 16) {
 		j = i;
 		do {
-			v |= (opcode & (1<<j)) ==0 ? 0 : 1;
+			v |= (opcode & (1<< (15-j))) ==0 ? 0 : 1;
 			v <<= 1;
 			j++;
 		} while  (j < 16 && instruction_str[j] == c);
-		v <<= 1;
+		v >>= 1;
 	}
 	return v;
 }
@@ -315,7 +325,13 @@ void encode_5x3r38i(enum OPCODES a1, ...) {
 void decode_5x3r38i(int pc, struct instruction_s  *inst) {
 	unsigned short op_code = memory[pc];
 
-	printf("%04x  %04x  |  %s r%d,%d\n",pc, op_code, inst->op_name, 1,2);
+	int r = extract_operand_from_instruction(inst, 'r', op_code);
+	r &= 0x0007;
+
+	int i = extract_operand_from_instruction(inst, 'i', op_code);
+	i &= 0x00ff;
+
+	printf("%04x  %04x  |  %s r%d,0x%02x\n",pc, op_code, inst->op_name, r,i);
 }
 
 
@@ -328,7 +344,17 @@ void decode_5x3r38i(int pc, struct instruction_s  *inst) {
 void decode_5x3r5d3b(int pc, struct instruction_s  *inst) {
 	unsigned short op_code = memory[pc];
 	
-	printf("%04x  %04x  |  %s r%d, (r%d,%d)\n",pc, op_code, inst->op_name, 1,2,3);
+	int r = extract_operand_from_instruction(inst, 'r', op_code);
+	r &= 0x0007;
+
+	int d = extract_operand_from_instruction(inst, 'd', op_code);
+	d &= 0x0007;
+
+	int b = extract_operand_from_instruction(inst, 'b', op_code);
+	b &= 0x001f;
+
+
+	printf("%04x  %04x  |  %s r%d, (r%d,%d)\n",pc, op_code, inst->op_name, r,b,d);
 }
 
 
@@ -341,6 +367,7 @@ void decode_5x3r5d3b(int pc, struct instruction_s  *inst) {
  */
 void decode_8x8p(int pc, struct instruction_s  *inst) {
 	unsigned short op_code = memory[pc];
+	char  buf[32];
 
 	int v = extract_operand_from_instruction(inst, 'p', op_code);
 	v =  (signed char)(v&0xff);
@@ -348,31 +375,48 @@ void decode_8x8p(int pc, struct instruction_s  *inst) {
 
 	// translate relative address to program counter value and get its lable value
 	char *label = label__get_by_pc(pc+v+1);
-
-	if (label)
-		printf("%04x  %04x  |  %s %s\n",pc, op_code, inst->op_name, label);
-	else
-		printf("%04x  %04x  |  %s %s\n",pc, op_code, inst->op_name, "label");
+	if (!label) {
+		push_label(0, pc+v+1);
+		label = label__get_by_pc(pc+v+1);
+	}
+	printf("%04x  %04x  |  %s %s\n",pc, op_code, inst->op_name, label);
 	
 }
 
 void decode_5x3r5x3s(int pc, struct instruction_s  *inst) {
 	unsigned short op_code = memory[pc];
 
-	printf("%04x  %04x  |  %s r%d,%d\n",pc, op_code, inst->op_name, 1,2);
+	int r = extract_operand_from_instruction(inst, 'r', op_code);
+	r &= 0x0007;
+
+	int s = extract_operand_from_instruction(inst, 's', op_code);
+	s &= 0x0007;
+
+	printf("%04x  %04x  |  %s r%d,%d\n",pc, op_code, inst->op_name, r,s);
 }
 
 void decode_loop(int pc, struct instruction_s  *inst) {
 	unsigned short op_code = memory[pc];
+	int n = extract_operand_from_instruction(inst, 'n', op_code);
+	n =  (signed char)(n&0xff);
+		
+	char *label = label__get_by_pc(pc+n+1);
+	if (!label) {
+		push_label(0, pc+n+1);
+		label = label__get_by_pc(pc+n+1);
+	}
 
-	printf("%04x  %04x  |  %s %s\n",pc, op_code, inst->op_name, "label");
+	printf("%04x  %04x  |  %s %s\n",pc, op_code, inst->op_name, label);
 }
 
 
 void decode_done(int pc, struct instruction_s  *inst) {
 	unsigned short op_code = memory[pc];
 
-	printf("%04x  %04x  |  %s %d\n",pc, op_code, inst->op_name, 3);
+	int j = extract_operand_from_instruction(inst, 'j', op_code);
+	j &= 0x0007;
+
+	printf("%04x  %04x  |  %s %d\n",pc, op_code, inst->op_name, j);
 }
 
 
@@ -664,21 +708,36 @@ void decode() {
 
 
 
-
-
-int main() {
-	
+void encode(char *asm_file1) {
+	char *asm_file = "start11:;ldi r0, 4;loop exit, 0;start:;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n";
 	pc = 0;
-	struct yy_buffer_state *my_string_buffer0 = yy_scan_string("start11:;ldi r0, 4;loop exit, 0;start:;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n"); 
+	struct yy_buffer_state *my_string_buffer0 = yy_scan_string(asm_file); 
 	yyparse(); 
 	yy_delete_buffer(my_string_buffer0);
 
-	pc = 0;
-	struct yy_buffer_state *my_string_buffer1 = yy_scan_string("start11:;ldi r0, 4;loop exit, 0;start:;st r4, (r5, 0);addi r5, 1;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n"); 
-	yyparse(); 
-	yy_delete_buffer(my_string_buffer1);
+
+}
+
+int main() {
+
+#if 1
+	memory[0]=0x804;
+	memory[1]=0x7803;
+	memory[2]=0x5c05;
+	memory[3]=0x1d01;
+	memory[4]=0x1c10;
+	memory[5]=0x300;
+	memory[6]=0x1c40;
+	memory[7]=0xb00;
+	memory[8]=0x4b00;
+	memory[9]=0x7df8;
+ 	 pc=10;	
+#else
+	encode(0);
+#endif
 
 
+	decode();
 	decode();
 	
 	return 0;

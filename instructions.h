@@ -93,7 +93,7 @@ typedef void (*decode_t) (unsigned short op_code, struct instruction_s  *inst);
 typedef void (*encode_t) (enum OPCODES op,...);
 
 
-void push_label(char *label);
+void push_label(char *label, int pc);
 encode_t get_encode_function(enum OPCODES op,char *op_name);
 
 void encode_5x3r38i(enum OPCODES opcode, ... );
