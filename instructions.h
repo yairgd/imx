@@ -75,7 +75,7 @@ enum OPCODES {
 	OP_LSLL,
 	OP_BCLRI,
 	OP_BSETI,
-	OP_BTSTI
+	OP_BTSTI,
 };
 
 
@@ -118,5 +118,7 @@ void decode_loop(int pc, struct instruction_s  *inst) ;
 void decode_done(int pc, struct instruction_s  *inst) ;
 void decode_3r(int pc, struct instruction_s  *inst) ;
 
+
+void push_to_memory(int type ,...);
 
 #endif

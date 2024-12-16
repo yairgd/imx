@@ -23,8 +23,8 @@ char op_str[16];
 %start list 
 
 %token <opcode> OPCODE  
-%token <iValue> NUMBER REG_NUMBER DIGIT NOTE1 NOTE2
-%token  <string>     LABEL 
+%token <iValue> NUMBER REG_NUMBER DIGIT NOTE1 NOTE2 BYTE WORD DWORD STRING
+%token  <string>     LABEL  BYTE_STRING 
 
 	/*%type  <a>     number */
 
@@ -51,6 +51,34 @@ list:    /*empty */
            yyerrok;
          }
          ;
+	 
+byte_list: /* empty */
+	|
+	NUMBER
+	{
+		push_to_memory(NUMBER,$1);		
+//		printf("a %d \n", $1);	
+	}
+	|
+	BYTE_STRING
+	{
+		push_to_memory(BYTE_STRING,$1);	
+//		printf("b %s \n", $1);			
+	}
+	|
+	byte_list ',' NUMBER
+	{
+		push_to_memory(NUMBER,$3);		
+	//	printf("c %d \n", $3);			
+	}
+	|
+	byte_list ',' BYTE_STRING
+	{
+		push_to_memory(BYTE_STRING,$3);	
+	//	printf("d %s \n", $3);			
+	}
+	;
+
 stat: 	OPCODE REG_NUMBER ',' NUMBER 
 	{
 		//encode_5x3r38i($1, $2,  $4);
@@ -113,8 +141,12 @@ stat: 	OPCODE REG_NUMBER ',' NUMBER
 		//printf ("opcode %d   %s\n",$1,$2);
 
 	}
-
-
+	|
+	BYTE  byte_list
+	{
+//		 push_to_memory($1,$2);
+	}
+	
 	;
 
 	/*

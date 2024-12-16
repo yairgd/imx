@@ -21,10 +21,17 @@ extern char op_str[16];
 [\n] {line++;col=0;return *yytext;}
 
 
+\"[^\"]*\"    { col+=strlen(yytext);strncpy (yylval.string, yytext,16 );return BYTE_STRING; }
+
 [0-9]+     	 {col+=strlen(yytext);yylval.iValue = atoi(yytext);return NUMBER;};
 0x[0-9 a-f]+     {col+=strlen(yytext);  yylval.iValue = strtol(yytext, NULL, 16);return NUMBER;};
 
 r[0-9]+   	 {col+=strlen(yytext);yylval.iValue = atoi(yytext+1);return REG_NUMBER;};
+
+
+".byte" {col+=strlen(yytext);yylval.iValue = BYTE;return BYTE;};
+".word" {col+=strlen(yytext);yylval.iValue = WORD;return WORD;};
+".dword" {col+=strlen(yytext);yylval.iValue = DWORD;return DWORD;};
 
 
 "andi"   OPCODE_FUNC(OP_ANDI)
@@ -54,6 +61,7 @@ r[0-9]+   	 {col+=strlen(yytext);yylval.iValue = atoi(yytext+1);return REG_NUMBE
 "lsrl"   OPCODE_FUNC(OP_RORL)
 "arsl"   OPCODE_FUNC(OP_RORL)
 "lsll"   OPCODE_FUNC(OP_RORL)
+
 
 [a-zA-Z0-9]+  {col+=strlen(yytext);strncpy (yylval.string, yytext,16 );yylval.string[MIN(strlen(yytext),15)]=0; return LABEL;} 
 

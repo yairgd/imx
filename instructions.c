@@ -17,10 +17,12 @@
  */
 
 #include "instructions.h"
+#include "y.tab.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 //http://blog.petri.us/sdma-hacking/part-1.html
 
@@ -35,7 +37,13 @@ static struct label {
 } lables[256]={0};
  static int label_idx = 0;
 
-
+/// reffer here: 
+/// i.MX 6SoloX Applications Processor Reference Manual
+/// p. 3725 (55.5.2 SDMA Instruction Set)
+/// or
+/// i.MX 8M Dual/8M QuadLite/8M Quad Applications Processors Reference Manual
+/// p. 1176 7.2.4.2 SDMA Instruction Set
+///
 struct instruction_s   instruction_set[] = {
 	{.opcode = OP_ANDI, 	.instruction = "00111rrriiiiiiii", .encode = encode_5x3r38i, .op_name="andi",	.decode = decode_5x3r38i}, /* ldi r,i */
 	{.opcode = OP_LDI,	.instruction = "00001rrriiiiiiii", .encode = encode_5x3r38i, .op_name="ldi", 	.decode = decode_5x3r38i},
@@ -634,6 +642,57 @@ void encode_loop(enum OPCODES a1 ,...) {
 
 }
 
+
+/**
+ * Created  10/24/2024                         
+ * @brief   pushes integr to memory, this instruction pushes  list of comman sepataed int into memory, 
+ * it is usealy flooed by a label
+ * .array: 1,2,3,4
+ * .string: hellow world
+ * r=a2, i=a4
+ * example for andi r2,12
+ * a1=OP_ANDI, a2=2  , a4=12 -> OP_ANDI 2,12
+ * @param   
+ * @return  
+ */
+void push_to_memory(int type ,...) {
+	static int p = 0;
+	char * str;
+   	va_list ap;
+	int i;
+	int  num ;
+
+	va_start(ap, type);
+	if (type == BYTE_STRING) {
+		str = va_arg(ap, char*);
+		for (i =1;i < strlen(str)-1;i++) {
+			*((char*)&memory[pc]+p) = str[i];
+			p++;
+			if (p == 2) {
+				p = 0;
+				pc++;
+				memory[pc] = 0;
+			}
+		}
+		
+	} else if (type == NUMBER) {
+		num = va_arg(ap, int);		
+		*((char*)&memory[pc]+p) = num & 0xff;
+		p++;
+		if (p == 2) {
+			p = 0;
+			pc++;
+			memory[pc] = 0;
+		}
+		
+	}
+	va_end(ap);
+
+
+	*((char*)(&memory[pc]+p)) = 
+	printf ("push type %d\n",type);
+}
+
 /**
  * Created  10/19/2022                         
  *                                                   1    2    
@@ -720,13 +779,17 @@ void decode() {
 
 
 
-void encode(char *asm_file1) {
-	char *asm_file = "start11:;ldi r0, 4;loop exit, 0;start:;st r4, (r5, 0);addi r5, 1;rorl r4;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15\n";
+void encode(char *asm_file1) {	
+	char *asm_file = "start11:;ldi r0, 4;loop exit, 0;start:;st r4, (r5, 0);addi r5, 1;rorl r4;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15;data:; .byte \"hello\",0,0x12,0x34  ;";
+
+//        char *asm_file = "start11:;ldi r0, 4;loop exit, 0;start:;st r4, (r5, 0);addi r5, 1;rorl r4;addi r4, 0x10;exit:;done 3;addi r4, 0x40;ldi r3, 0;cmpeqi r3, 0 ;bt start;mov r12,r15; data: .byte \"hello world\" ; \n";
+	
+	//char *asm_file = "start11: ; ldi r0, 4; ; \n";
 	pc = 0;
 	struct yy_buffer_state *my_string_buffer0 = yy_scan_string(asm_file); 
 	yyparse(); 
 	yy_delete_buffer(my_string_buffer0);
-
+	pc++;
 
 }
 
